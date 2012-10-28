@@ -83,6 +83,10 @@ static inline bool compaction_deferred(struct zone *zone)
 {
 	return 1;
 }
+static inline int compact_nodes(bool sync)
+{
+    return COMPACT_CONTINUE;
+}
 
 #endif /* CONFIG_COMPACTION */
 
