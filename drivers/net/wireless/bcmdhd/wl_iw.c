@@ -1626,7 +1626,7 @@ wl_iw_send_priv_event(
 	strcpy(extra, flag);
 	wrqu.data.length = strlen(extra);
 	wireless_send_event(dev, cmd, &wrqu, extra);
-	net_os_wake_lock_timeout_enable(dev, DHD_EVENT_TIMEOUT_MS);
+	net_os_wake_lock_timeout_enable(dev, DHD_EVENT_TIMEOUT);
 	WL_TRACE(("Send IWEVCUSTOM Event as %s\n", extra));
 
 	return 0;
@@ -6094,13 +6094,13 @@ wl_iw_set_cscan(
 
 	if (g_onoff == G_WLAN_SET_OFF) {
 		WL_TRACE(("%s: driver is not up yet after START\n", __FUNCTION__));
-		return -1;
+		goto exit_proc;
 	}
 
 	if (wrqu->data.length < (strlen(CSCAN_COMMAND) + sizeof(cscan_tlv_t))) {
 		WL_ERROR(("%s argument=%d  less %d\n", __FUNCTION__,
 		          wrqu->data.length, (int)(strlen(CSCAN_COMMAND) + sizeof(cscan_tlv_t))));
-		return -1;
+		goto exit_proc;
 	}
 
 #ifdef TLV_DEBUG
@@ -6232,7 +6232,7 @@ wl_iw_set_cscan(
 			else {
 				WL_ERROR(("%s Ignoring CSCAN : First Scan is not done yet %d\n",
 					__FUNCTION__, g_first_counter_scans));
-				return -EBUSY;
+				goto exit_proc;
 			}
 		}
 #endif 

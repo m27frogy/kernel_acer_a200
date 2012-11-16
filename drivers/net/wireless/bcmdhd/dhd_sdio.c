@@ -382,7 +382,7 @@ static bool dhd_readahead;
 
 /* To check if there's window offered */
 #define DATAOK(bus) \
-	(((uint8)(bus->tx_max - bus->tx_seq) > 1) && \
+	(((uint8)(bus->tx_max - bus->tx_seq) > 2) && \
 	(((uint8)(bus->tx_max - bus->tx_seq) & 0x80) == 0))
 
 /* To check if there's window offered for ctrl frame */
@@ -5198,7 +5198,7 @@ dhdsdio_chipmatch(uint16 chipid)
 
 static void *
 dhdsdio_probe(uint16 venid, uint16 devid, uint16 bus_no, uint16 slot,
-	uint16 func, uint bustype, void *regsva, osl_t * osh, void *sdh)
+	uint16 func, uint bustype, void *regsva, osl_t * osh, void *sdh, void *dev)
 {
 	int ret;
 	dhd_bus_t *bus;
@@ -5318,7 +5318,7 @@ dhdsdio_probe(uint16 venid, uint16 devid, uint16 bus_no, uint16 slot,
 	}
 
 	/* Attach to the dhd/OS/network interface */
-	if (!(bus->dhd = dhd_attach(osh, bus, SDPCM_RESERVE))) {
+	if (!(bus->dhd = dhd_attach(osh, bus, SDPCM_RESERVE, dev))) {
 		DHD_ERROR(("%s: dhd_attach failed\n", __FUNCTION__));
 		goto fail;
 	}
@@ -5736,7 +5736,7 @@ dhdsdio_release_malloc(dhd_bus_t *bus, osl_t *osh)
 		return;
 
 	if (bus->rxbuf) {
-#ifndef CONFIG_DHD_USE_STATIC_BUF
+#ifndef DHD_USE_STATIC_BUF
 		MFREE(osh, bus->rxbuf, bus->rxblen);
 #endif
 		bus->rxctl = bus->rxbuf = NULL;
@@ -5744,7 +5744,7 @@ dhdsdio_release_malloc(dhd_bus_t *bus, osl_t *osh)
 	}
 
 	if (bus->databuf) {
-#ifndef CONFIG_DHD_USE_STATIC_BUF
+#ifndef DHD_USE_STATIC_BUF
 		MFREE(osh, bus->databuf, MAX_DATA_BUF);
 #endif
 		bus->databuf = NULL;
@@ -6048,9 +6048,7 @@ static int
 _dhdsdio_download_firmware(struct dhd_bus *bus)
 {
 	int bcmerror = -1;
-#if defined(CONFIG_BCMDHD_FW_DIR)
 	char *p;
-#endif
 
 	bool embed = FALSE;	/* download embedded firmware */
 	bool dlok = FALSE;	/* download firmware succeeded */
@@ -6072,7 +6070,7 @@ _dhdsdio_download_firmware(struct dhd_bus *bus)
 
 	/* External image takes precedence if specified */
 	if ((bus->fw_path != NULL) && (bus->fw_path[0] != '\0')) {
-#if defined(CONFIG_BCMDHD_FW_DIR)
+
 		/* replace bcm43xx with bcm4330 or bcm4329 */
 		if ((p = strstr(bus->fw_path, "bcm43xx"))) {
 			if (bus->cl_devid == 0x4329) {
@@ -6084,7 +6082,7 @@ _dhdsdio_download_firmware(struct dhd_bus *bus)
 				*(p + 6)='0';
 			}
 		}
-#endif
+
 		if (dhdsdio_download_code_file(bus, bus->fw_path)) {
 			DHD_ERROR(("%s: dongle image file download failed\n", __FUNCTION__));
 #ifdef BCMEMBEDIMAGE
