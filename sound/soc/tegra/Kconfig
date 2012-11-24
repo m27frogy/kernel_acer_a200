@@ -153,3 +153,7 @@ config ACER_FM_SINGLE_MIC
 	default n
 	help
 	  Say Y or M here if you want to switch mic by fm2018.
+
+config TEGRA_VOODOO_SOUND
+        bool "Voodoo sound"
+        default y

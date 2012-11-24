@@ -36,6 +36,7 @@
 #include <trace/events/asoc.h>
 
 #include "wm8903.h"
+#include "codec_param.h"
 
 /* Register defaults at reset */
 static u16 wm8903_reg_defaults[] = {
@@ -239,6 +240,27 @@ struct wm8903_priv {
 	struct gpio_chip gpio_chip;
 #endif
 };
+
+struct snd_soc_codec *global_codec;
+EXPORT_SYMBOL(global_codec) ;
+
+struct wm8903_parameters  audio_params[]={
+        /* A500(PICASSO) */
+        {
+                0x3e,   /* Speaker volume: +4dB*/
+                0x39,   /* Headset volume: -2dB*/
+                0xC0,   /* DMIC ADC volume: 0dB*/
+                0x05,   /* AMIC volume: +24dB, for differential MIC*/
+        },
+        /* SL101(EP102) */
+        {
+                0x39,   /* Speaker volume: +0dB*/
+                0x37,   /* Headset volume: -2dB*/
+                0xC0,   /* DMIC ADC volume: 0dB*/
+                0x05,   /* AMIC volume: +24dB, for differential MIC*/
+        }
+};
+EXPORT_SYMBOL(audio_params);
 
 static int wm8903_volatile_register(struct snd_soc_codec *codec, unsigned int reg)
 {
