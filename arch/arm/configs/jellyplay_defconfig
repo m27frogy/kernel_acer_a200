@@ -1,7 +1,7 @@
 #
 # Automatically generated make config: don't edit
 # Linux/arm 2.6.39.4 Kernel Configuration
-# Wed Nov 28 14:11:08 2012
+# Tue Dec 11 20:49:07 2012
 #
 CONFIG_ARM=y
 CONFIG_HAVE_PWM=y
@@ -40,7 +40,7 @@ CONFIG_IRQ_WORK=y
 CONFIG_EXPERIMENTAL=y
 CONFIG_INIT_ENV_ARG_LIMIT=32
 CONFIG_CROSS_COMPILE=""
-CONFIG_LOCALVERSION="-jellyplay_v3.2"
+CONFIG_LOCALVERSION="-jellyplay_v4.0"
 # CONFIG_LOCALVERSION_AUTO is not set
 CONFIG_HAVE_KERNEL_GZIP=y
 CONFIG_HAVE_KERNEL_LZMA=y
@@ -1191,13 +1191,11 @@ CONFIG_WLAN=y
 # CONFIG_ATH_COMMON is not set
 # CONFIG_BCM4329 is not set
 CONFIG_BCMDHD=y
-CONFIG_BCMDHD_FW_DIR="/system/vendor/firmware"
-CONFIG_BCMDHD_NVRAM_DIR="/system/etc/wifi"
-CONFIG_BCMDHD_NVRAM_PATH="/system/etc/wifi/bcmdhd.cal"
-# CONFIG_DHD_USE_STATIC_BUF is not set
+CONFIG_BCMDHD_FW_PATH="/system/vendor/firmware/fw_bcmdhd.bin"
+CONFIG_BCMDHD_NVRAM_PATH="/system/vendor/firmware/bcmdhd.cal"
 CONFIG_BCMDHD_WIFI_CONTROL_FUNC=y
-CONFIG_BCMDHD_HW_OOB=y
-CONFIG_BCMDHD_ENABLE_P2P=y
+# CONFIG_BCMDHD_HW_OOB is not set
+# CONFIG_BCMDHD_ENABLE_P2P is not set
 # CONFIG_HOSTAP is not set
 # CONFIG_IPW2100 is not set
 # CONFIG_IWM is not set
