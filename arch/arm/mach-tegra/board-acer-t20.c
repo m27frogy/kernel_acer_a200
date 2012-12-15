@@ -103,7 +103,7 @@ static struct tegra_ulpi_config ulpi_phy_config = {
 	.clk = "cdev2",
 };
 
-#ifdef CONFIG_BCM4329_RFKILL
+//#ifdef CONFIG_BCM4329_RFKILL
 
 static struct resource ventana_bcm4329_rfkill_resources[] = {
 	{
@@ -135,16 +135,15 @@ static struct platform_device ventana_bcm4329_rfkill_device = {
 	.resource       = ventana_bcm4329_rfkill_resources,
 };
 
+/**
 static void __init ventana_bt_rfkill(void)
 {
-	/*Add Clock Resource*/
+	//Add Clock Resource
 	clk_add_alias("bcm4329_32k_clk", ventana_bcm4329_rfkill_device.name, \
 				"blink", NULL);
 	return;
 }
-#else
-static inline void ventana_bt_rfkill(void) { }
-#endif
+**/
 
 static struct resource ventana_bluesleep_resources[] = {
 	[0] = {
@@ -963,7 +962,7 @@ static void __init acer_t20_init(void)
 	ventana_gps_init();
 	ventana_panel_init();
 	ventana_sensors_init();
-	ventana_bt_rfkill();
+	//ventana_bt_rfkill();
 	ventana_power_off_init();
 	acer_t20_emc_init();
 
