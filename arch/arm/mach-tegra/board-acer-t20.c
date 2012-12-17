@@ -125,6 +125,12 @@ static struct resource ventana_bcm4329_rfkill_resources[] = {
 		.end    = TEGRA_GPIO_PD1,
 		.flags  = IORESOURCE_IO,
 	},
+        {
+                .name   = "bcm4329_ext_wake_gpio",
+                .start  = TEGRA_GPIO_PS7,
+                .end    = TEGRA_GPIO_PS7,
+                .flags  = IORESOURCE_IO,
+  },
 #endif
 };
 
@@ -173,9 +179,11 @@ static struct platform_device ventana_bluesleep_device = {
 	.resource       = ventana_bluesleep_resources,
 };
 
+extern void bluesleep_setup_uart_port(struct platform_device *uart_dev);
 static void __init ventana_setup_bluesleep(void)
 {
 	platform_device_register(&ventana_bluesleep_device);
+        bluesleep_setup_uart_port(&tegra_uartc_device);
 	tegra_gpio_enable(TEGRA_GPIO_PU6);
 	tegra_gpio_enable(TEGRA_GPIO_PU1);
 	return;
