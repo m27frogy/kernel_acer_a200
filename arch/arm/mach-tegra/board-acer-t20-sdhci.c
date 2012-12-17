@@ -35,6 +35,7 @@
 #define VENTANA_WLAN_RST	TEGRA_GPIO_PK6
 #define VENTANA_WLAN_WOW	TEGRA_GPIO_PS0
 #define VENTANA_SDIO_WOW	TEGRA_GPIO_PY6
+#define VENTANA_WLAN_IRQ        TEGRA_GPIO_PS0
 
 static void (*wifi_status_cb)(int card_present, void *dev_id);
 static void *wifi_status_cb_devid;
@@ -45,6 +46,15 @@ static int ventana_wifi_reset(int on);
 static int ventana_wifi_power(int on);
 static int ventana_wifi_set_carddetect(int val);
 
+static struct resource ventana_wifi_wakeup_resources[] = {
+       {
+               .name   = "bcmdhd_wlan_irq",
+               .start  = TEGRA_GPIO_TO_IRQ(VENTANA_WLAN_IRQ),
+               .end    = TEGRA_GPIO_TO_IRQ(VENTANA_WLAN_IRQ),
+               .flags  = IORESOURCE_IRQ | IORESOURCE_IRQ_HIGHLEVEL | IORESOURCE_IRQ_SHAREABLE,
+       },
+};
+
 static struct wifi_platform_data ventana_wifi_control = {
 	.set_power	= ventana_wifi_power,
 	.set_reset	= ventana_wifi_reset,
@@ -53,7 +63,7 @@ static struct wifi_platform_data ventana_wifi_control = {
 
 static struct resource wifi_resource[] = {
 	[0] = {
-		.name  = "bcm4329_wlan_irq",
+		.name  = "bcmdhd_wlan_irq",
 		.start = TEGRA_GPIO_TO_IRQ(TEGRA_GPIO_PS0),
 		.end   = TEGRA_GPIO_TO_IRQ(TEGRA_GPIO_PS0),
 		.flags = IORESOURCE_IRQ | IORESOURCE_IRQ_HIGHLEVEL | IORESOURCE_IRQ_SHAREABLE,
@@ -63,8 +73,10 @@ static struct resource wifi_resource[] = {
 static struct platform_device ventana_wifi_device = {
 	.name		= "bcmdhd_wlan",
 	.id		= 1,
-	.num_resources  = 1,
-	.resource	= wifi_resource,
+        .num_resources  = ARRAY_SIZE(ventana_wifi_wakeup_resources),
+        .resource       = ventana_wifi_wakeup_resources,
+	//.num_resources  = 1,
+	//.resource	= wifi_resource,
 	.dev		= {
 		.platform_data = &ventana_wifi_control,
 	},
