@@ -31,11 +31,10 @@
 #include "gpio-names.h"
 #include "board.h"
 
-//#define VENTANA_WLAN_PWR	TEGRA_GPIO_PK5
+#define VENTANA_WLAN_PWR	TEGRA_GPIO_PK5
 #define VENTANA_WLAN_RST	TEGRA_GPIO_PK6
 #define VENTANA_WLAN_WOW	TEGRA_GPIO_PS0
 #define VENTANA_SDIO_WOW	TEGRA_GPIO_PY6
-#define VENTANA_WLAN_IRQ        TEGRA_GPIO_PS0
 
 static void (*wifi_status_cb)(int card_present, void *dev_id);
 static void *wifi_status_cb_devid;
@@ -46,14 +45,8 @@ static int ventana_wifi_reset(int on);
 static int ventana_wifi_power(int on);
 static int ventana_wifi_set_carddetect(int val);
 
-static struct resource ventana_wifi_wakeup_resources[] = {
-       {
-               .name   = "bcmdhd_wlan_irq",
-               .start  = TEGRA_GPIO_TO_IRQ(VENTANA_WLAN_IRQ),
-               .end    = TEGRA_GPIO_TO_IRQ(VENTANA_WLAN_IRQ),
-               .flags  = IORESOURCE_IRQ | IORESOURCE_IRQ_HIGHLEVEL | IORESOURCE_IRQ_SHAREABLE,
-       },
-};
+int g_wifi_set_carddetect=0;
+EXPORT_SYMBOL(g_wifi_set_carddetect);
 
 static struct wifi_platform_data ventana_wifi_control = {
 	.set_power	= ventana_wifi_power,
@@ -73,10 +66,8 @@ static struct resource wifi_resource[] = {
 static struct platform_device ventana_wifi_device = {
 	.name		= "bcmdhd_wlan",
 	.id		= 1,
-        .num_resources  = ARRAY_SIZE(ventana_wifi_wakeup_resources),
-        .resource       = ventana_wifi_wakeup_resources,
-	//.num_resources  = 1,
-	//.resource	= wifi_resource,
+	.num_resources  = 1,
+	.resource	= wifi_resource,
 	.dev		= {
 		.platform_data = &ventana_wifi_control,
 	},
@@ -136,6 +127,8 @@ static struct embedded_sdio_data embedded_sdio_data0 = {
 };
 
 static struct tegra_sdhci_platform_data tegra_sdhci_platform_data0 = {
+	.clk_id = NULL,
+	.force_hs = 0,
 	.mmc_data = {
 		.register_status_notify	= ventana_wifi_status_register,
 		.embedded_sdio = &embedded_sdio_data0,
@@ -145,21 +138,28 @@ static struct tegra_sdhci_platform_data tegra_sdhci_platform_data0 = {
 	.cd_gpio = -1,
 	.wp_gpio = -1,
 	.power_gpio = -1,
+	.bus_width = 8,
 };
 
 static struct tegra_sdhci_platform_data tegra_sdhci_platform_data2 = {
 	.wow_gpio = -1,
+	.clk_id = NULL,
+	.force_hs = 1,
 	.cd_gpio = TEGRA_GPIO_PI5,
 	.wp_gpio = TEGRA_GPIO_PH1,
 	.power_gpio = TEGRA_GPIO_PT3,
+	.bus_width = 4,
 };
 
 static struct tegra_sdhci_platform_data tegra_sdhci_platform_data3 = {
+	.clk_id = NULL,
 	.is_8bit = 1,
 	.wow_gpio = -1,
 	.cd_gpio = -1,
 	.wp_gpio = -1,
 	.power_gpio = TEGRA_GPIO_PI6,
+	.force_hs = 0,
+	.bus_width = 8,
 	.mmc_data = {
 		.built_in = 1,
 	}
@@ -213,6 +213,7 @@ static int ventana_wifi_set_carddetect(int val)
 		wifi_status_cb(val, wifi_status_cb_devid);
 	else
 		pr_warning("%s: Nobody to notify\n", __func__);
+	g_wifi_set_carddetect = val;
 	return 0;
 }
 
@@ -220,16 +221,16 @@ static int ventana_wifi_power(int on)
 {
 	pr_debug("%s: %d\n", __func__, on);
 
-//	gpio_set_value(VENTANA_WLAN_PWR, on);
-//	mdelay(100);
+	gpio_set_value(VENTANA_WLAN_PWR, on);
+	mdelay(100);
 	gpio_set_value(VENTANA_WLAN_RST, on);
 	mdelay(200);
-/*
+
 	if (on)
 		clk_enable(wifi_32k_clk);
 	else
 		clk_disable(wifi_32k_clk);
-*/
+
 	return 0;
 }
 
@@ -241,22 +242,24 @@ static int ventana_wifi_reset(int on)
 
 static int __init ventana_wifi_init(void)
 {
-/*
+
 	wifi_32k_clk = clk_get_sys(NULL, "blink");
 	if (IS_ERR(wifi_32k_clk)) {
 		pr_err("%s: unable to get blink clock\n", __func__);
 		return PTR_ERR(wifi_32k_clk);
 	}
-*/
-//	gpio_request(VENTANA_WLAN_PWR, "wlan_power");
+
+	gpio_request(VENTANA_WLAN_PWR, "wlan_power");
 	gpio_request(VENTANA_WLAN_RST, "wlan_rst");
 	gpio_request(VENTANA_WLAN_WOW, "bcmsdh_sdmmc");
 
 	tegra_gpio_enable(VENTANA_WLAN_RST);
 	tegra_gpio_enable(VENTANA_WLAN_WOW);
+	tegra_gpio_enable(VENTANA_WLAN_PWR);
 
 	gpio_direction_output(VENTANA_WLAN_RST, 0);
 	gpio_direction_input(VENTANA_WLAN_WOW);
+	gpio_direction_output(VENTANA_WLAN_PWR, 0);
 
 	platform_device_register(&ventana_wifi_device);
 

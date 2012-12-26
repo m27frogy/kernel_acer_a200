@@ -21,10 +21,13 @@
 #include <asm/mach/mmc.h>
 
 struct tegra_sdhci_platform_data {
+	const char *clk_id;
 	int wow_gpio;
+	int force_hs;
 	int cd_gpio;
 	int wp_gpio;
 	int power_gpio;
+	int bus_width;
 	int is_8bit;
 	unsigned int tap_delay;
 #if defined(CONFIG_ARCH_ACER_T20) || defined(CONFIG_ARCH_ACER_T30)
@@ -40,5 +43,4 @@ struct tegra_sdhci_platform_data {
 	unsigned int max_clk_limit;
 	struct mmc_platform_data mmc_data;
 };
-
 #endif
