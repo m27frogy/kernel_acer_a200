@@ -1077,7 +1077,8 @@ struct cfg80211_pmksa {
  * memory, free @mask only!
  */
 struct cfg80211_wowlan_trig_pkt_pattern {
-  u8 *mask, *pattern;+  int pattern_len;
+  u8 *mask, *pattern;
+  int pattern_len;
 };
 
 /**
