@@ -429,7 +429,12 @@ static int tegra_wm8903_jack_notifier(struct notifier_block *self,
 		break;
 #endif
 	case SND_JACK_MICROPHONE:
+                /* TODO use HP detect instead of MIC */
 		/* mic: would not report */
+                if (machine_is_ventana()) {
+                        state = BIT_HEADSET_NO_MIC;
+                        break;
+          }
 	default:
 		state = BIT_NO_HEADSET;
 	}

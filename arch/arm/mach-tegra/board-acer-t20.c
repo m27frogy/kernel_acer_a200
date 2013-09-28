@@ -45,7 +45,6 @@
 #include <mach/iomap.h>
 #include <mach/irqs.h>
 #include <mach/pinmux.h>
-#include <mach/iomap.h>
 #include <mach/io.h>
 #include <mach/i2s.h>
 #include <mach/tegra_wm8903_pdata.h>
@@ -958,7 +957,7 @@ static void __init acer_t20_init(void)
 	tegra_ehci2_device.dev.platform_data
 		= &ventana_ehci2_ulpi_platform_data;
 	platform_add_devices(ventana_devices, ARRAY_SIZE(ventana_devices));
-
+        
 	ventana_sdhci_init();
 	acer_t20_charge_init();
 	acer_t20_regulator_init();
