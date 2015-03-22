@@ -178,11 +178,11 @@ static struct platform_device ventana_bluesleep_device = {
 	.resource       = ventana_bluesleep_resources,
 };
 
-extern void bluesleep_setup_uart_port(struct platform_device *uart_dev);
+/*extern void bluesleep_setup_uart_port(struct platform_device *uart_dev);*/
 static void __init ventana_setup_bluesleep(void)
 {
 	platform_device_register(&ventana_bluesleep_device);
-        bluesleep_setup_uart_port(&tegra_uartc_device);
+/*        bluesleep_setup_uart_port(&tegra_uartc_device);*/
 	tegra_gpio_enable(TEGRA_GPIO_PU6);
 	tegra_gpio_enable(TEGRA_GPIO_PU1);
 	return;
