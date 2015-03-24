@@ -858,9 +858,10 @@ functions_store(struct device *pdev, struct device_attribute *attr,
 			if (err)
 				pr_err("android_usb: Cannot enable '%s'", name);
 		}
+
+        	/* HID driver always enabled, it's the whole point of this kernel patch */
+        	android_enable_function(dev, "hid");
 	}
-	/* HID driver always enabled, it's the whole point of this kernel patch */
-	android_enable_function(dev, "hid");
 
         mutex_unlock(&dev->mutex);
 
